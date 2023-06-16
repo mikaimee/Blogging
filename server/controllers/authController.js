@@ -6,7 +6,7 @@ const SECRET_AT = process.env.ACCESS_TOKEN_SECRET
 const SECRET_RT = process.env.REFRESH_TOKEN_SECRET
 
 const register = async(req, res) => {
-    const { username, password, roles, isAdmin } = req.body
+    const { username, password, isAdmin } = req.body
 
     // Confirm data
     if (!username || !password) {
@@ -25,39 +25,36 @@ const register = async(req, res) => {
 
         // If don't have array of roles or if array but doesn't have length, use username + password
         // If not, use username, password, roles
-        const newUser = (!Array.isArray(roles) || !roles.length)
-        ? {username, "password": hashedPassword, isAdmin}
-        : {username, "password": hashedPassword, roles, isAdmin}
+        const newUser = {username, password: hashedPassword, isAdmin}
 
         // Create and store new user 
         const user = await User.create(newUser)
         if (user) { // is created 
-
             // Create an accessToken
-            const accessToken = jwt.sign(
-                {
-                    id: user._id,
-                    username: user.username
-                },
-                SECRET_AT,
-                { expiresIn: '15m' }
-            )
+            // const accessToken = jwt.sign(
+            //     {
+            //         id: user._id,
+            //         username: user.username
+            //     },
+            //     SECRET_AT,
+            //     { expiresIn: '30m' }
+            // )
         
-            const refreshToken = jwt.sign(
-                {username: user.username},
-                SECRET_RT,
-                {expiresIn: '1d'}
-            )
+            // const refreshToken = jwt.sign(
+            //     {username: user.username},
+            //     SECRET_RT,
+            //     {expiresIn: '1d'}
+            // )
         
-            user.refreshToken = refreshToken
-            const result = await user.save()
-            console.log(result)
-            res.cookie('jwt', refreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'None',
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
+            // user.refreshToken = refreshToken
+            // const result = await user.save()
+            // console.log(result)
+            // res.cookie('jwt', refreshToken, {
+            //     httpOnly: true,
+            //     secure: true,
+            //     sameSite: 'None',
+            //     maxAge: 7 * 24 * 60 * 60 * 1000
+            // })
 
             res.status(201).json({ 
                 _id: user._id,
@@ -66,7 +63,7 @@ const register = async(req, res) => {
                 password: user.password,
                 email: user.email,
                 isAdmin: user.isAdmin,
-                token: accessToken,
+                token: await user.getSigninToken(),
                 message: `New user ${username} created` 
             })
         } else {
@@ -97,39 +94,37 @@ const login = async (req, res) => {
     const match = await bcrypt.compare(password, loggingUser.password)
     if(!match) return res.status(401).json({message: 'Invalid input'})
 
-    const accessToken = jwt.sign(
-        {
-            id: loggingUser._id,
-            username: loggingUser.username
-        },
-        SECRET_AT,
-        { expiresIn: '10s' }
-    )
-
-    const refreshToken = jwt.sign(
-        {"username": loggingUser.username},
-        SECRET_RT,
-        {expiresIn: '1d'}
-    )
-
-    loggingUser.refreshToken = refreshToken
-    const result = await loggingUser.save()
-    console.log(result)
-    res.cookie('jwt', refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    }) 
+    // const accessToken = jwt.sign(
+    //     {
+    //         id: loggingUser._id,
+    //         username: loggingUser.username
+    //     },
+    //     SECRET_AT,
+    //     { expiresIn: '1d' }
+    // )
+    // const refreshToken = jwt.sign(
+    //     {"username": loggingUser.username},
+    //     SECRET_RT,
+    //     {expiresIn: '1d'}
+    // )
+    // loggingUser.refreshToken = refreshToken
+    // const result = await loggingUser.save()
+    // console.log(result)
+    // res.cookie('jwt', refreshToken, {
+    //     httpOnly: true,
+    //     secure: true,
+    //     sameSite: 'None',
+    //     maxAge: 7 * 24 * 60 * 60 * 1000
+    // }) 
 
     res.status(201).json({
-        _id: result._id,
-        avatar: result.avatar,
-        username: result.username,
-        password: result.password,
-        email: result.email,
-        isAdmin: result.isAdmin,
-        token: accessToken,
+        _id: loggingUser._id,
+        avatar: loggingUser.avatar,
+        username: loggingUser.username,
+        password: loggingUser.password,
+        email: loggingUser.email,
+        isAdmin: loggingUser.isAdmin,
+        token: await loggingUser.getSigninToken(),
         message: 'You are logged in!'
     })
 }

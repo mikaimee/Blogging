@@ -1,7 +1,7 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
-// import {uploadPicture} from '../middleware/uploadingPic'
-// import { fileRemover } from "../config/fileRemover"
+// const uP = require('../middleware/uploadingPic')
+// const fileR = require('../config/fileRemover')
 
 const allUsers = async (req, res) => {
     const users = await User.find()
@@ -26,19 +26,18 @@ const oneUser = async(req, res) => {
         email: user.email,
         isAdmin: user.isAdmin
     })
-
 }
 
 const updateUser = async (req, res) => {
-    const { id, username, roles, password, avatar, email} = req.body
+    const { _id, username, isAdmin, password, avatar, email} = req.body
 
     // Confirm data 
-    if (!id || !username) {
+    if (!_id || !username) {
         return res.status(400).json({ message: 'All fields except password are required' })
     }
 
     // Does the user exist to update?
-    const user = await User.findById(id).exec()
+    const user = await User.findById(_id).exec()
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
     }
@@ -46,13 +45,13 @@ const updateUser = async (req, res) => {
     // Check for duplicate 
     const duplicate = await User.findOne({ username }).collation({locale: 'en', strength: 2}).lean().exec()
     // Allow updates to the original user 
-    if (duplicate && duplicate?._id.toString() !== id) {
+    if (duplicate && duplicate?._id.toString() !== _id) {
         return res.status(409).json({ message: 'Duplicate username' })
     }
     user.username = username
     user.email = email
     user.avatar = avatar
-    user.roles = roles
+    user.isAdmin = isAdmin
     if (password) {
         // Hash password 
         user.password = await bcrypt.hash(password, 10) // salt rounds 
@@ -60,59 +59,77 @@ const updateUser = async (req, res) => {
 
     const updatedUser = await user.save()
 
-    res.json({ message: `${updatedUser.username} updated` })
+    res.json({ 
+        _id: updatedUser._id,
+        avatar: updatedUser.avatar,
+        username: updatedUser.username,
+        password: updatedUser.password,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        token: await updatedUser.getSigninToken(),
+        message: `${updatedUser.username} updated` 
+    })
 }
 
 // const updateProfilePic = async(req, res) => {
-//     try {
-//         const upload = uploadPicture.single("profilePicture")
+//     try{
+//         const upload = uploadPicture.uploadPic.single('profilePicture')
 
 //         upload(req, res, async function (err) {
 //             if (err) {
-//                 res.json({message: 'Unknown error occured'})
 //                 console.log(err.message)
 //             }
 //             else {
-//                 // if everything works well
 //                 if (req.file) {
-//                     let filename
-//                     let updatedUser = await User.findById(req.user._id).exec()
-//                     filename = updatedUser.avatar
-//                     // Delete the old profile pic
-//                     if (filename) {
-//                         fileRemover(filename)
-//                     }
-//                     // Update to new file
-//                     updatedUser.avatar = req.file.filename
-//                     await updatedUser.save()
-//                     res.json({ message: 'user avatar is updated' })
+//                     const updatedUser = await User.findByIdAndUpdate(req.user._id, {
+//                         avatar: req.file.filename
+//                     }, {new: true})
+//                     res.json({
+//                         _id: updatedUser._id,
+//                         avatar: updatedUser.avatar,
+//                         username: updatedUser.username,
+//                         password: updatedUser.password,
+//                         email: updatedUser.email,
+//                         isAdmin: updatedUser.isAdmin,
+//                         token: await updatedUser.getSigninToken(),
+//                         message: `${updatedUser.username} updated` 
+//                     })
 //                 }
 //                 else {
 //                     let filename
-//                     let updatedUser = await User.findById(req.user._id).exec()
+//                     let updatedUser = await User.findById(req.user._id)
 //                     filename = updatedUser.avatar
-//                     updatedUser.avatar = ""
+//                     updateUser.avatar = "" // if there's no file, reset
 //                     await updatedUser.save()
-//                     fileRemover(filename)
-//                     res.json({ message: 'user avatar is updated' })
+//                     fileR.fileRemover(filename)
+//                     res.json({
+//                         _id: updatedUser._id,
+//                         avatar: updatedUser.avatar,
+//                         username: updatedUser.username,
+//                         password: updatedUser.password,
+//                         email: updatedUser.email,
+//                         isAdmin: updatedUser.isAdmin,
+//                         token: await updatedUser.getSigninToken(),
+//                         message: `${updatedUser.username} updated`
+//                     })
 //                 }
 //             }
 //         })
 //     }
 //     catch (err) {
-//         console.error(err)
+//         console.log(err)
 //     }
 // }
 
 const deleteUser = async (req, res) => {
-    if (!req?.body?.id) {
+    if (!req?.body?._id) {
         return res.status(400).json({message: 'User ID is required'})
     }
-    const user = await User.findOne({_id: req.body.id}).exec()
+    const user = await User.findOne({_id: req.body._id}).exec()
     if (!user) {
-        return res.status(204).json({message: `User with ID of ${req.body.id} is not found`})
+        return res.status(204).json({message: `User with ID of ${req.body._id} is not found`})
     }
-    const result = await user.deleteOne({_id: req.body.id})
+    const result = await user.deleteOne({_id: req.body._id})
     res.json(result)
 }
 

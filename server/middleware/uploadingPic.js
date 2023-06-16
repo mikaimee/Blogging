@@ -1,27 +1,28 @@
-import multer from 'multer'
-import path from 'path'
+const multer = require('multer')
+const path = require('path')
 
+// where the files will be saved
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, "../uploads"))
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`)
+        cb(null, `${Date.now()}=${file.originalname}`)
     }
 })
 
-const uploadPicture = multer({
+const uploadPic = multer({
     storage: storage,
     limits: {
-        fileSize: 1 * 1000000 // 1 MB
+        fileSize: 1 * 1000000 // 1MB
     },
-    fileFilter: function (req, file, cb) {
+    fileFilter: function(req, file, cb) {
         let ext = path.extname(file.originalname)
-        if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
             return cb("Only images are allowed")
         }
         cb(null, true)
     }
 })
 
-export {uploadPicture}
+module.exports = {uploadPic}

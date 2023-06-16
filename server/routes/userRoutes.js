@@ -1,15 +1,17 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
+const {protect} = require('../middleware/jwt')
 
 router.route('/')
-    // .get(verifyRoles(ROLES_LIST.Admin), userController.allUsers)
-    // .delete(verifyRoles(ROLES_LIST.Admin), userController.deleteUser)
-    .get(userController.allUsers)
+    .get(userController.allUsers  )
     .delete(userController.deleteUser)
     .patch(userController.updateUser)
 
 router.route('/profile')
     .get(userController.oneUser)
+
+// router.route('/profilePic')
+//     .put(userController.updateProfilePic)
 
 module.exports = router
