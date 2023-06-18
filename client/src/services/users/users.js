@@ -30,38 +30,40 @@ export const signin = async({username, password}) => {
     }
 }
 
-export const getUserProfile = async({ token }) => {
+export const getUserProfile = async ({ token }) => {
     try {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-
-        const {data} = await axios.get('http://localhost:8000/user/profile', config)
-        return data
+            Authorization: `Bearer ${token}`,
+            },
+        };
+    const { data } = await axios.get("http://localhost:8000/user/profile", config);
+    return data;
+    } 
+    catch (error) {
+        if (error.response && error.response.data.message)
+            throw new Error(error.response.data.message);
+        throw new Error(error.message);
     }
-    catch (err) {
-        if (err.response && err.response.data.message) 
-            throw new Error(err.response.data.message)
-        throw new Error (err.message)
-    }
-}
+};
 
-export const updateProfile = async({ token, userData }) => {
+export const updateProfile = async ({ token, userData }) => {
     try {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-
-        const {data} = await axios.patch('http://localhost:8000/user/', userData, config)
-        return data
+            Authorization: `Bearer ${token}`,
+            },
+        };
+        const { data } = await axios.patch(
+        "http://localhost:8000/user",
+        userData,
+        config
+        );
+        return data;
+    } 
+    catch (error) {
+        if (error.response && error.response.data.message)
+            throw new Error(error.response.data.message);
+        throw new Error(error.message);
     }
-    catch (err) {
-        if (err.response && err.response.data.message) 
-            throw new Error(err.response.data.message)
-        throw new Error (err.message)
-    }
-}
+};

@@ -23,10 +23,7 @@ const UserSchema = new Schema({
     avatar: {
         type: String,
         default: ""
-    },
-    // refreshToken : {
-    //     type: String
-    // }
+    }
 })
 
 UserSchema.methods.getSigninToken = function() {

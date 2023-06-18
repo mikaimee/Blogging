@@ -14,76 +14,73 @@ const EMAIL_VALID = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
 const ProfilePage = () => {
 
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const queryClient = useQueryClient()
-    const userState = useSelector((state) => state.user)
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const queryClient = useQueryClient();
+    const userState = useSelector((state) => state.user);
 
     const {
-        data: profileData, 
-        isLoading: profileIsLoading, 
-        error: profileError
+        data,
+        isLoading: profileIsLoading,
+        error: profileError,
     } = useQuery({
-        // function to be run when page loads
         queryFn: () => {
-            return getUserProfile({token: userState?.userInfo?.token})
+        return getUserProfile({ token: userState?.userInfo?.token });
         },
-        queryKey: ["profile"]
-    })
+        queryKey: ["profile"],
+    });
 
-    const {mutate, isLoading} = useMutation({
-        mutationFn: ({username, password}) => {
-            return updateProfile({
-                token: userState.userInfo.token,
-                userData: {username, password}
-            })
+    const { mutate, isLoading: updateProfileIsLoading } = useMutation({
+        mutationFn: ({ username, password }) => {
+        return updateProfile({
+            token: userState.userInfo.token,
+            userData: { username, password },
+        });
         },
         onSuccess: (data) => {
-            console.log(data)
-            dispatch(userActions.setUserInfo(data))
-            localStorage.setItem('account', JSON.stringify(data))
-            queryClient.invalidateQueries(["profile"])
-            toast.success("Profile is updated")
-
+        dispatch(userActions.setUserInfo(data));
+        localStorage.setItem("account", JSON.stringify(data));
+        queryClient.invalidateQueries(["profile"]);
+        toast.success("Profile is updated");
         },
         onError: (error) => {
-            toast.error(error.message)
-            console.log(error)
-        }
-    })
+        toast.error(error.message);
+        console.log(error);
+        },
+    });
 
     // If already registered, go back to the home 
     useEffect(() => {
-        if(!userState?.userInfo) {
-            navigate("/")
+        if (!userState.userInfo) {
+        navigate("/");
         }
-    }, [navigate, userState?.userInfo])
+    }, [navigate, userState.userInfo]);
 
     const {
-        register, 
-        handleSubmit, 
-        formState:{errors, isValid}
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
     } = useForm({
         defaultValues: {
             username: "",
             password: ""
-        },
-        values: {
-            username: profileIsLoading ? "": profileData?.username,
-        },
-        mode: "onChange"
-    })
+    },
+    values: {
+        username: profileIsLoading ? "" : data.username
+    },
+    mode: "onChange",
+    });
 
     const submitHandler = (data) => {
-        const {username, password} = data
-        mutate({username, password})
-    }
+        const { username, password } = data;
+        mutate({ username, password });
+    };
 
     return (
         <Layout>
             <section>
                 <div>
-                    <ProfilePicture avatar={profileData?.avatar} />
+                    <ProfilePicture avatar={data?.avatar} />
                     {/* Only will call submitHandler if handleSubmit does not have any error b/c it validates the data */}
                     <form onSubmit={handleSubmit(submitHandler)}>
                         <div>
