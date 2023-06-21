@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
-const {protect} = require('../middleware/jwt')
+const protection = require('../middleware/jwt')
 
 router.route('/')
     .get(userController.allUsers  )
@@ -9,7 +9,7 @@ router.route('/')
     .patch(userController.updateUser)
 
 router.route('/profile')
-    .get(userController.oneUser)
+    .get(protection.authProtect, userController.oneUser)
 
 // router.route('/profilePic')
 //     .put(userController.updateProfilePic)

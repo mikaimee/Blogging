@@ -5,128 +5,73 @@ const jwt = require('jsonwebtoken')
 const SECRET_AT = process.env.ACCESS_TOKEN_SECRET
 const SECRET_RT = process.env.REFRESH_TOKEN_SECRET
 
-const register = async(req, res) => {
-    const { username, password, isAdmin } = req.body
-
-    // Confirm data
-    if (!username || !password) {
-        return res.status(400).json({ message: 'All fields are required' })
-    }
-
-    // Check for duplicate username
-    const duplicate = await User.findOne({ username }).collation({locale: 'en', strength: 2}).lean().exec()
-    if (duplicate) {
-        return res.status(409).json({ message: 'Duplicate username' })
-    }
+const registration = async (req, res) => {
+    const {username, email, password, isAdmin} = req.body
 
     try {
-        // encrypt password
-        const hashedPassword = await bcrypt.hash(password, 10)
+            if (!username || !password || !email) {
+                return res.status(400).json({ message: 'All fields are required' })
+            }
 
-        // If don't have array of roles or if array but doesn't have length, use username + password
-        // If not, use username, password, roles
-        const newUser = {username, password: hashedPassword, isAdmin}
+            const duplicate = await User.findOne({ username }).collation({locale: 'en', strength: 2}).lean().exec()
+            if (duplicate) {
+                return res.status(409).json({ message: 'User already exists' })
+            }
 
-        // Create and store new user 
-        const user = await User.create(newUser)
-        if (user) { // is created 
-            // Create an accessToken
-            // const accessToken = jwt.sign(
-            //     {
-            //         id: user._id,
-            //         username: user.username
-            //     },
-            //     SECRET_AT,
-            //     { expiresIn: '30m' }
-            // )
-        
-            // const refreshToken = jwt.sign(
-            //     {username: user.username},
-            //     SECRET_RT,
-            //     {expiresIn: '1d'}
-            // )
-        
-            // user.refreshToken = refreshToken
-            // const result = await user.save()
-            // console.log(result)
-            // res.cookie('jwt', refreshToken, {
-            //     httpOnly: true,
-            //     secure: true,
-            //     sameSite: 'None',
-            //     maxAge: 7 * 24 * 60 * 60 * 1000
-            // })
-
-            res.status(201).json({ 
-                _id: user._id,
-                avatar: user.avatar,
-                username: user.username,
-                password: user.password,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                token: await user.getSigninToken(),
+            const newUser = await User.create({
+                username, 
+                email,
+                password,
+                isAdmin
+            })
+            return res.status(201).json({
+                _id: newUser._id,
+                avatar: newUser.avatar,
+                username: newUser.username,
+                password: newUser.password,
+                email: newUser.email,
+                isAdmin: newUser.isAdmin,
+                token: await newUser.getSigninToken(),
                 message: `New user ${username} created` 
             })
-        } else {
-            res.status(400).json({ message: 'Invalid user data received' })
-        }
     }
-    catch(err) {
-        console.log(err)
-        res.status(400).json(err)
+    catch (error) {
+        res.status(400).json({message: error.message})
     }
-
 }
 
 const login = async (req, res) => {
     const {username, password} = req.body
-
-    // If no username or password is entered
+    
     if (!username || !password) {
-        return res.status(400).json({ message: 'All fields are required' })
+        res.status(400).json({message: "All fields are required"})
     }
 
-    const loggingUser = await User.findOne({username: username}).exec()
-    
-    // If the loggingUser doesn't exist
-    if (!loggingUser) return res.status(401).json({message: 'User Not found'})
-    
-    // If the passwod matches with input
-    const match = await bcrypt.compare(password, loggingUser.password)
-    if(!match) return res.status(401).json({message: 'Invalid input'})
+    try {
+        const user = await User.findOne({username: username}).exec()
+        if (!user) {
+            res.status(404).json({message: "Invalid credentials"})
+        }
 
-    // const accessToken = jwt.sign(
-    //     {
-    //         id: loggingUser._id,
-    //         username: loggingUser.username
-    //     },
-    //     SECRET_AT,
-    //     { expiresIn: '1d' }
-    // )
-    // const refreshToken = jwt.sign(
-    //     {"username": loggingUser.username},
-    //     SECRET_RT,
-    //     {expiresIn: '1d'}
-    // )
-    // loggingUser.refreshToken = refreshToken
-    // const result = await loggingUser.save()
-    // console.log(result)
-    // res.cookie('jwt', refreshToken, {
-    //     httpOnly: true,
-    //     secure: true,
-    //     sameSite: 'None',
-    //     maxAge: 7 * 24 * 60 * 60 * 1000
-    // }) 
+        const validPassword = await user.matchPassword(password)
+        if (!validPassword) {
+            res.status(404).json({message: "Invalid credentials"})
+        }
 
-    res.status(201).json({
-        _id: loggingUser._id,
-        avatar: loggingUser.avatar,
-        username: loggingUser.username,
-        password: loggingUser.password,
-        email: loggingUser.email,
-        isAdmin: loggingUser.isAdmin,
-        token: await loggingUser.getSigninToken(),
-        message: 'You are logged in!'
-    })
+        return res.status(201).json({
+            _id: user._id,
+            avatar: user.avatar,
+            username: user.username,
+            password: user.password,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            token: await user.getSigninToken(),
+            message: `${username} is logged in!` 
+        })
+    }
+    catch(error) {
+        res.status(400).json({error: error.message})
+    }
 }
 
 const refreshToken = async (req, res) => {
@@ -187,7 +132,7 @@ const logout = async(req, res) => {
 }
 
 module.exports = {
-    register,
+    registration,
     login,
     refreshToken,
     logout

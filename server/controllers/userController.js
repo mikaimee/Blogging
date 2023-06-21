@@ -10,22 +10,41 @@ const allUsers = async (req, res) => {
 }
 
 const oneUser = async(req, res) => {
-    // const {id} = req.body
-    // if (!id) {
+    // const {_id} = req.body
+    // if (!_id) {
     //     return res.status(400).json({message: 'User ID is required'})
     // }
-    const user = await User.findById(req.body._id).exec()
-    if(!user) {
-        return res.status(204).json({message: `User with id of ${req.params.id} is not found`})
+    // const user = await User.findById(req.body._id).exec()
+    // if(!user) {
+    //     return res.status(204).json({message: `User with id of ${req.body._id} is not found`})
+    // }
+    // res.status(201).json({
+    //     _id: user._id,
+    //     avatar: user.avatar,
+    //     username: user.username,
+    //     password: user.password,
+    //     email: user.email,
+    //     isAdmin: user.isAdmin
+    // })
+    try {
+        let user = await User.findById(req.user._id);
+    
+        if (user) {
+            return res.status(201).json({
+                _id: user._id,
+                avatar: user.avatar,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin,
+            });
+        } 
+        else {
+            return res.status(401).json("User is not found")
+        }
+    } 
+    catch (error) {
+        console.log(error);
     }
-    res.json({
-        _id: user._id,
-        avatar: user.avatar,
-        username: user.username,
-        password: user.password,
-        email: user.email,
-        isAdmin: user.isAdmin
-    })
 }
 
 const updateUser = async (req, res) => {

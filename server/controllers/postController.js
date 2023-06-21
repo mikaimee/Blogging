@@ -122,11 +122,22 @@ const deletePost = async (req, res) => {
     res.json({message:`Post: ${deletedPost.title} with ID ${deletedPost._id} deleted`})
 }
 
+const likePost = async(req, res) => {
+    if (!req?.params?.id) return res.status(400).json({'message': 'Post ID required'})
+
+    const post = await Post.findById(req?.params?.id)
+    const addLikePost = await Post.findByIdAndUpdate(req?.params?.id, {
+        likes: post.likes + 1
+    }, {new: true})
+    res.json(addLikePost)
+}
+
 module.exports = {
     getAllPosts,
     // getSinglePost,
     getOnePost,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    likePost
 }

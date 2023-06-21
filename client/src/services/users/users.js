@@ -34,11 +34,11 @@ export const getUserProfile = async ({ token }) => {
     try {
         const config = {
             headers: {
-            Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         };
-    const { data } = await axios.get("http://localhost:8000/user/profile", config);
-    return data;
+        const { data } = await axios.get("http://localhost:8000/user/profile", config);
+        return data;
     } 
     catch (error) {
         if (error.response && error.response.data.message)
