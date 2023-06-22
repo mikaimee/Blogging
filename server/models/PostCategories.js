@@ -7,5 +7,4 @@ const PostCategoriesSchema = new mongoose.Schema({
     }
 }, {timestamps: true})
 
-const PostCategories = model("PostCategories", PostCategoriesSchema)
-export default PostCategories
+module.exports = mongoose.model('PostCategories', PostCategoriesSchema)

@@ -10,17 +10,18 @@ const CommentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    post: {
+    postId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
         required: true
     },
-    // Comment thread
+    // Tells if comment is the main comment or reply
     parent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
         default: null
     },
+    // fetch data of user that replied to comment
     replyOnUser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', 
