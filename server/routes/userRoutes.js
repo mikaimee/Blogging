@@ -6,7 +6,7 @@ const protection = require('../middleware/jwt')
 router.route('/')
     .get(userController.allUsers  )
     .delete(userController.deleteUser)
-    .patch(userController.updateUser)
+    .patch(protection.authProtect, userController.updateProfile)
 
 router.route('/profile')
     .get(protection.authProtect, userController.oneUser)

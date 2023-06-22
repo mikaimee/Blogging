@@ -6,10 +6,10 @@ const SECRET_AT = process.env.ACCESS_TOKEN_SECRET
 const SECRET_RT = process.env.REFRESH_TOKEN_SECRET
 
 const registration = async (req, res) => {
-    const {username, email, password, isAdmin} = req.body
+    const {username, password, isAdmin} = req.body
 
     try {
-            if (!username || !password || !email) {
+            if (!username || !password) {
                 return res.status(400).json({ message: 'All fields are required' })
             }
 
@@ -19,8 +19,7 @@ const registration = async (req, res) => {
             }
 
             const newUser = await User.create({
-                username, 
-                email,
+                username,
                 password,
                 isAdmin
             })

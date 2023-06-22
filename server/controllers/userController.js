@@ -47,47 +47,74 @@ const oneUser = async(req, res) => {
     }
 }
 
-const updateUser = async (req, res) => {
-    const { _id, username, isAdmin, password, avatar, email} = req.body
+// const updateUser = async (req, res) => {
+//     const { _id, username, isAdmin, password, avatar, email} = req.body
 
-    // Confirm data 
-    if (!_id || !username) {
-        return res.status(400).json({ message: 'All fields except password are required' })
+//     // Confirm data 
+//     if (!_id || !username) {
+//         return res.status(400).json({ message: 'All fields except password are required' })
+//     }
+
+//     // Does the user exist to update?
+//     const user = await User.findById(_id).exec()
+//     if (!user) {
+//         return res.status(400).json({ message: 'User not found' })
+//     }
+
+//     // Check for duplicate 
+//     const duplicate = await User.findOne({ username }).collation({locale: 'en', strength: 2}).lean().exec()
+//     // Allow updates to the original user 
+//     if (duplicate && duplicate?._id.toString() !== _id) {
+//         return res.status(409).json({ message: 'Duplicate username' })
+//     }
+//     user.username = username
+//     user.email = email
+//     user.avatar = avatar
+//     user.isAdmin = isAdmin
+//     if (password) {
+//         // Hash password 
+//         user.password = await bcrypt.hash(password, 10) // salt rounds 
+//     }
+
+//     const updatedUser = await user.save()
+
+//     res.json({ 
+//         _id: updatedUser._id,
+//         avatar: updatedUser.avatar,
+//         username: updatedUser.username,
+//         password: updatedUser.password,
+//         email: updatedUser.email,
+//         isAdmin: updatedUser.isAdmin,
+//         token: await updatedUser.getSigninToken(),
+//         message: `${updatedUser.username} updated` 
+//     })
+// }
+
+const updateProfile = async (req, res) => {
+    try {
+        let user = await User.findById(req.user._id)
+        if (!user) {
+            return res.staus(404).json({message: 'User not found'})
+        }
+
+        user.username = req.body.username || user.username
+        user.password = req.body.password
+
+        const updatedProfile = await user.save()
+        res.json({
+            _id: updatedProfile._id,
+            avatar: updatedProfile.avatar,
+            username: updatedProfile.username,
+            password: updatedProfile.password,
+            email: updatedProfile.email,
+            isAdmin: updatedProfile.isAdmin,
+            token: await updatedProfile.getSigninToken(),
+            message: `${updatedProfile.username} updated`
+        })
     }
-
-    // Does the user exist to update?
-    const user = await User.findById(_id).exec()
-    if (!user) {
-        return res.status(400).json({ message: 'User not found' })
+    catch (err) {
+        console.log(err)
     }
-
-    // Check for duplicate 
-    const duplicate = await User.findOne({ username }).collation({locale: 'en', strength: 2}).lean().exec()
-    // Allow updates to the original user 
-    if (duplicate && duplicate?._id.toString() !== _id) {
-        return res.status(409).json({ message: 'Duplicate username' })
-    }
-    user.username = username
-    user.email = email
-    user.avatar = avatar
-    user.isAdmin = isAdmin
-    if (password) {
-        // Hash password 
-        user.password = await bcrypt.hash(password, 10) // salt rounds 
-    }
-
-    const updatedUser = await user.save()
-
-    res.json({ 
-        _id: updatedUser._id,
-        avatar: updatedUser.avatar,
-        username: updatedUser.username,
-        password: updatedUser.password,
-        email: updatedUser.email,
-        isAdmin: updatedUser.isAdmin,
-        token: await updatedUser.getSigninToken(),
-        message: `${updatedUser.username} updated` 
-    })
 }
 
 // const updateProfilePic = async(req, res) => {
@@ -155,7 +182,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     allUsers,
     oneUser,
-    updateUser,
+    updateProfile,
     // updateProfilePic,
     deleteUser
 }

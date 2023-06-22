@@ -3,7 +3,7 @@ import axios from 'axios'
 export const signup = async({username, password}) => {
     try {
         const { data } = await axios.post('http://localhost:8000/auth/register', {
-        username, 
+        username,
         password
         })
         return data
