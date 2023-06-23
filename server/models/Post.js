@@ -40,7 +40,7 @@ const PostSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PostCategories'
     }]
-}, {timestamps: true, toJSON: {virtuals: true}})
+}, {timestamps: true, toJSON: {virtuals: true}}) 
 
 PostSchema.virtual('comments', {
     // ref tells Mongoose which model to populate documents from

@@ -1,4 +1,6 @@
+const Comment = require('../models/Comment')
 const Post = require('../models/Post')
+const { v4: uuid } = require('uuid')
 
 const getAllPosts = async(req, res) => {
     const posts = await Post.find().lean()
@@ -11,115 +13,96 @@ const getAllPosts = async(req, res) => {
 }
 
 const getOnePost = async (req, res) => {
-    if (!req?.params?.id) return res.status(400).json({'message': 'Post ID required'})
+    try{
+        const post = await Post.findOne({slug: req.params.slug}).populate([
+            // populate user data
+            {path: 'user', select: ['avatar', 'username']},
+            // retrieve comments 
+            {
+                path: 'comments',
+                // will populate the comments array
+                populate: [
+                    {path: 'user', select: ['avatar', 'username']},
+                    {path: 'replies'}
+                ]
+            }
+        ])
 
-    const post = await Post.findOne({_id: req.params.id}).exec()
-    if (!post) {
-        return res.status(204).json({'message': 'No post matches with provided ID'})
+        if (!post) {
+            return res.status(400).json({message: 'No post found'})
+        }
+        return res.json(post)
     }
-    res.json(post)
+    catch (error) {
+        res.status(400).json({message: error.message})
+    }
 }
-
-// const getSinglePost = async (req, res) => {
-//     if (!req?.params?.id) return res.status(400).json({'message': 'Post ID required'})
-
-//     const post = await Post.findOne({_id: req?.parama?.id}).populate([
-//         {
-//             path: "user",
-//             select: ["avatar", "username"]
-//         },
-//         {
-//             path: "comments",
-//             match: {
-//                 check: true,
-//                 parent: null
-//             }, populate: [
-//                 {
-//                     path: "user",
-//                     select: ["avatar", "username"]
-//                 },
-//                 {
-//                     path: "replies",
-//                     match: {
-//                         check: true
-//                     },
-//                     populate: [
-//                         {
-//                             path: "user",
-//                             select: ["avatar", "username"]
-//                         }
-//                     ]
-//                 }
-//             ]
-//         }
-//     ]).exec()
-//     if(!post) {
-//         return res.status(204).json({message: 'Post not found'})
-//     }
-//     res.json(post)
-
-// }
 
 const createPost = async (req, res) => {
-    const {user, title, summary, body} = req.body
-    if (!user || !title || !summary || !body) {
-        return res.status(400).json({message: 'All field are required'})
+    try {
+        const post = new Post({
+            title: "sample title",
+            summary: "sample summary",
+            body: {
+                type: "doc",
+                content: []
+            },
+            slug: uuid(),
+            photo: "",
+            user: req.user._id
+        })
+        const createdPost = await post.save()
+        return res.json(createdPost)
     }
-
-    const post = await Post.create({
-        user: req.user._id, 
-        title, 
-        summary, 
-        body: {
-            type: "doc", 
-            content: []
-        },
-        photo: ""
-    })
-    if (post) {
-        return res.status(201).json({message: 'Post is created'})
-    }
-    else {
-        res.status(400).json({ message: 'Invalid post data received' })
+    catch (error) {
+        res.status(400).json({message: error.message})
     }
 }
 
-const updatePost = async(req, res) => {
-    const {id, user, title, summary, body, tags, categories} = req.body
-    if (!id || !user || !title || !summary|| !body) {
-        return res.status(400).json({message: 'All fields are required'})
+const updatePost = async (req, res) => {
+    try {
+        const post = await Post.findOne({slug: req.params.slug})
+
+        if (!post) {
+            return res.status(404).json({message: 'Post was not found'})
+        }
+
+        post.title = req.body.title || post.title
+        post.sumary = req.body.sumary || post.sumary
+        post.body = req.body.body || post.body
+        post.slug = req.body.slug || post.slug
+        post.tags = req.body.tags || post.tags
+        post.likes = req.body.likes || post.likes
+        post.categories = req.body.categories || post.categories
+        
+        const updatedPost = await post.save()
+        return res.json({
+            updatedPost,
+            message: `${updatedPost.title} updated`
+        })
+
     }
-
-    const post = await Post.findById(req?.params?.id).exec()
-    if (!post) {
-        return res.status(400).json({message: 'Post is not found'})
+    catch (error) {
+        res.status(400).json({message: error.message})
     }
-
-    post.user = user
-    post.title = title
-    post.body = body
-    post.tags = tags
-    post.categories = categories
-
-    const updatedPost = await post.save()
-
-    res.json({ message: `${updatedPost.title} updated` })
 }
 
 const deletePost = async (req, res) => {
-    const {id} = req.body
-    if (!id) {
-        return res.status(400).json({ message: 'Post ID Required' })
+    try{
+        const post = await Post.findOneAndDelete({slug: req.params.slug})
+        if (!post) {
+            return res.status(404).json({message: "Post is not found"})
+        }
+
+        await Comment.deleteMany({postId: post._id})
+
+        return res.json({
+            message: "Post has been deleted"
+        })
     }
-
-    const post = await Post.findById(req?.params?.id).exec()
-    if (!post) {
-        return res.status(400).json({ message: 'Post not found' })
+    catch (error) {
+        res.status(400).json({message: error.message})
     }
-
-    const deletedPost = await post.deleteOne()
-
-    res.json({message:`Post: ${deletedPost.title} with ID ${deletedPost._id} deleted`})
 }
 
 const likePost = async(req, res) => {

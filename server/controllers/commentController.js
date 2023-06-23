@@ -1,4 +1,5 @@
 const Comment = require('../models/Comment')
+const Post = require('../models/Post')
 
 const getAllComments = async(req, res) => {
     const comments = await Comment.find().lean()
@@ -9,17 +10,26 @@ const getAllComments = async(req, res) => {
 }
 
 const createComment = async(req, res) => {
-    const {user, post, body} = req.body
-    if (!user || !post || !body) {
-        return res.status(400).json({message: 'All field are required'})
-    }
+    try {
+        const {body, slug, parent, replyOnUser} = req.body
 
-    const comment = await Comment.create({user, post, body})
-    if (comment) {
-        return res.status(201).json({message: 'Comment is created'})
+        const post = await Post.findOne({slug: slug})
+        if (!post) {
+            res.status(404).json({message: 'Post does not exist'})
+        }
+
+        const newComment = new Comment({
+            user: req.user._id,
+            body,
+            postId: post._id,
+            parent,
+            replyOnUser
+        })
+        const savedComment = await newComment.save()
+        return res.json(savedComment)
     }
-    else {
-        res.status(400).json({ message: 'Invalid comment data received' })
+    catch (error) {
+        res.status(400).json({message: error.message})
     }
 }
 

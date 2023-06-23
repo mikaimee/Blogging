@@ -22,4 +22,13 @@ const authProtect = async (req, res, next) => {
     }
 }
 
-module.exports = {authProtect}
+const adminOnly = (req, res, next) => {
+    if (req.user && req.user.isAdmin) {
+        next()
+    }
+    else {
+        return res.status(401).json({message: 'Not authorized to access'})
+    }
+}
+
+module.exports = {authProtect, adminOnly}

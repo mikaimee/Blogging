@@ -27,7 +27,7 @@ const CommentSchema = new mongoose.Schema({
         ref: 'User', 
         default: null
     }
-}, {timestamps: true})
+}, {timestamps: true, toJSON: {virtuals: true}})
 
 // Populated Virtual: contains documents from another collection
 // Will populate documents from the model in ref whose FOREIGNFIELD matching the documet's LOCALFIELD
