@@ -3,13 +3,18 @@ const Post = require('../models/Post')
 const { v4: uuid } = require('uuid')
 
 const getAllPosts = async(req, res) => {
-    const posts = await Post.find().lean()
-
-    if (!posts?.length) {
-        return res.status(400).json({message: 'No posts are found'})
+    try{
+        const post = await Post.find({}).populate([
+            {
+                path: 'user',
+                select: ['avatar', 'username']
+            }
+        ])
+        res.json(post)
     }
-
-    res.json(posts)
+    catch (error) {
+        res.status(400).json({message: error.message})
+    }
 }
 
 const getOnePost = async (req, res) => {
