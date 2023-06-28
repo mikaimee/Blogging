@@ -12,7 +12,7 @@ router.route('/:slug')
     .patch(protection.authProtect, postController.updatePost)
     .delete(protection.authProtect, postController.deletePost)
 
-router.route('/:id/like')
+router.route('/:slug/like')
     .post(postController.likePost)
 
 module.exports = router

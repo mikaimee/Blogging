@@ -1,12 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const ArticleInfo = ({post}) => {
+const PostInfo = ({post}) => {
     return (
         <section>
             <div>
                 {/* insert image here */}
                 <div>
+                    {/* title */}
                     <Link to={`/blog/${post.slug}`}>
                         <h3>{post.title}</h3>
                     </Link>
@@ -25,4 +26,4 @@ const ArticleInfo = ({post}) => {
     )
 }
 
-export default ArticleInfo
+export default PostInfo
