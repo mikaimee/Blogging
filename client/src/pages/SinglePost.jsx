@@ -5,6 +5,8 @@ import { getSinglePost } from '../services/posts'
 import { useSelector } from 'react-redux'
 import parse from 'html-react-parser'
 
+import CommentBox from '../components/comments/CommentBox'
+
 import { generateHTML } from '@tiptap/html'
 import Bold from '@tiptap/extension-bold'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -15,6 +17,7 @@ import Document from "@tiptap/extension-document";
 const SinglePost = () => {
 
     const {slug} = useParams()
+    const userState = useSelector((state) =>state.user)
     const [body, setBody] = useState(null)
 
     const {data, isLoading, isError} = useQuery({
@@ -50,6 +53,10 @@ const SinglePost = () => {
                 <div>
                     {body}
                 </div>
+                <CommentBox 
+                    loggedinUserId={userState.userInfo?._id}
+                    comments = {data?.comments}
+                />
             </div>
         </div>
     )

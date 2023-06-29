@@ -20,23 +20,12 @@ const Posts = () => {
     return (
         <section>
             <div>
-                {!isLoading ? (
-                    [...Array(3)].map((item, index) => (
-                        <PostInfoSkeleton
-                            key={index}
-                            className=""
-                        />
-                    ))
-                ): isError ? (
-                    <ErrorMessage message="Cannot fetch data" />
-                ) : (
-                    data.map((post) => (
-                        <PostInfo
-                            key={post._id}
-                            post={post}
-                        />
-                    ))
-                )}
+                {!isLoading && !isError && data.map((post) => (
+                    <PostInfo
+                        key={post._id}
+                        post={post}
+                    />
+                ))}
             </div>
             <button>
                 <span>More Articles</span>

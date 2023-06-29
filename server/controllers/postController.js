@@ -28,7 +28,13 @@ const getOnePost = async (req, res) => {
                 // will populate the comments array
                 populate: [
                     {path: 'user', select: ['avatar', 'username']},
-                    {path: 'replies'}
+                    {path: 'replies',
+                    populate: [
+                        {
+                            path: 'user', select: ['avatar', 'username']
+                        }
+                    ]
+                    }
                 ]
             }
         ])
