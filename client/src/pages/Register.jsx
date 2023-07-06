@@ -59,13 +59,13 @@ const Register = () => {
 
     return (
         <Layout>
-            <section>
-                <div>
-                    <h1>Register</h1>
+            <section className="container mx-auto px-5 py-10">
+                <div className="w-full max-w-sm mx-auto">
+                    <h1 className="font-roboto text-2xl font-bold text-center text-dark-hard mb-8">Register</h1>
                     {/* Only will call submitHandler if handleSubmit does not have any error b/c it validates the data */}
                     <form onSubmit={handleSubmit(submitHandler)}>
-                        <div>
-                            <label htmlFor="username">Username</label>
+                        <div className="flex flex-col mb-6 w-full">
+                            <label htmlFor="username" className="text-[#5a7184] font-semibold block">Username</label>
                             <input 
                                 type='text'
                                 id='username'
@@ -80,14 +80,17 @@ const Register = () => {
                                     }
                                 })}
                                 placeholder='Enter username here'
+                                className={`placeholder:text-[#959ead] text-dark-hard mt-3 rounded-lg px-5 py-4 font-semibold block outline-none border ${
+                                    errors.username ? "border-red-500" : "border-[#c3cad9]"
+                                }`}
                             />
                             {errors.username?.message && (
-                                <p>{errors.username?.message}</p>
+                                <p className="text-red-500 text-xs mt-1">{errors.username?.message}</p>
                             )}
                         </div>
 
-                        <div>
-                            <label htmlFor="password">Password</label>
+                        <div className="flex flex-col mb-6 w-full">
+                            <label htmlFor="password" className="text-[#5a7184] font-semibold block">Password</label>
                             <input 
                                 type='pasword'
                                 id='password'
@@ -102,14 +105,17 @@ const Register = () => {
                                     }
                                 })}
                                 placeholder='Enter password here'
+                                className={`placeholder:text-[#959ead] text-dark-hard mt-3 rounded-lg px-5 py-4 font-semibold block outline-none border ${
+                                    errors.password ? "border-red-500" : "border-[#c3cad9]"
+                                }`}
                             />
                             {errors.password?.message && (
-                                <p>{errors.password?.message}</p>
+                                <p className="text-red-500 text-xs mt-1">{errors.password?.message}</p>
                             )}
                         </div>
 
-                        <div>
-                            <label htmlFor="confirmPassword">Confirm Password</label>
+                        <div className="flex flex-col mb-6 w-full">
+                            <label htmlFor="confirmPassword" className="text-[#5a7184] font-semibold block">Confirm Password</label>
                             <input 
                                 type='password'
                                 id='confirmPassword'
@@ -126,16 +132,25 @@ const Register = () => {
                                     }
                                 })}
                                 placeholder='Enter Confirm Password'
+                                className={`placeholder:text-[#959ead] text-dark-hard mt-3 rounded-lg px-5 py-4 font-semibold block outline-none border ${
+                                    errors.confirmPassword ? "border-red-500" : "border-[#c3cad9]"
+                                }`}
                             />
                             {errors.confirmPassword?.message && (
-                                <p>{errors.confirmPassword?.message}</p>
+                                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword?.message}</p>
                             )}
                         </div>
 
-                        <Link to="/login">
+                        <Link to="/login" className="text-primary">
                             <p>Already have an account? </p>
                         </Link>
-                        <button type='submit' disabled={!isValid || isLoading}>Register</button>
+                        <button 
+                            className="mt-5 lg:mt-0 border-2 border-blue-500 px-6 py-2 rounded-full text-blue-500 font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300" 
+                            type='submit' 
+                            disabled={!isValid || isLoading}
+                        >
+                            Register
+                        </button>
                     </form>
                 </div>
             </section>

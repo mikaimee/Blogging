@@ -30,11 +30,9 @@ const getOnePost = async (req, res) => {
                     {path: 'user', select: ['avatar', 'username']},
                     {path: 'replies',
                     populate: [
-                        {
-                            path: 'user', select: ['avatar', 'username']
-                        }
+                        {path: 'user', select: ['avatar', 'username']}
                     ]
-                    }
+                }
                 ]
             }
         ])

@@ -54,13 +54,13 @@ const Login = () => {
 
     return (
         <Layout>
-            <section>
-                <div>
-                    <h1>Login</h1>
+            <section className="container mx-auto px-5 py-10">
+                <div className="w-full max-w-sm mx-auto">
+                    <h1 className="font-roboto text-2xl font-bold text-center text-dark-hard mb-8">Login</h1>
                     {/* Only will call submitHandler if handleSubmit does not have any error b/c it validates the data */}
                     <form onSubmit={handleSubmit(submitHandler)}>
-                        <div>
-                            <label htmlFor="username">Username</label>
+                        <div className="flex flex-col mb-6 w-full">
+                            <label htmlFor="username" className="text-[#5a7184] font-semibold block">Username</label>
                             <input 
                                 type='text'
                                 id='username'
@@ -71,14 +71,17 @@ const Login = () => {
                                     }
                                 })}
                                 placeholder='Enter username here'
+                                className={`placeholder:text-[#959ead] text-dark-hard mt-3 rounded-lg px-5 py-4 font-semibold block outline-none border ${
+                                    errors.username ? "border-red-500" : "border-[#c3cad9]"
+                                }`}
                             />
                             {errors.username?.message && (
                                 <p>{errors.username?.message}</p>
                             )}
                         </div>
 
-                        <div>
-                            <label htmlFor="password">Password</label>
+                        <div className="flex flex-col mb-6 w-full">
+                            <label htmlFor="password" className="text-[#5a7184] font-semibold block">Password</label>
                             <input 
                                 type='pasword'
                                 id='password'
@@ -89,17 +92,20 @@ const Login = () => {
                                     }
                                 })}
                                 placeholder='Enter password here'
+                                className={`placeholder:text-[#959ead] text-dark-hard mt-3 rounded-lg px-5 py-4 font-semibold block outline-none border ${
+                                    errors.password ? "border-red-500" : "border-[#c3cad9]"
+                                }`}
                             />
                             {errors.password?.message && (
                                 <p>{errors.password?.message}</p>
                             )}
                         </div>
 
-                        <Link to="/forget-password">Forgot your password?</Link>
-                        <Link to="/register">
+                        <Link to="/forget-password" className="text-sm font-semibold text-primary">Forgot your password?</Link>
+                        <Link to="/register" className="text-primary">
                             <p>Need an account? </p>
                         </Link>
-                        <button type='submit' disabled={!isValid || isLoading}>Login</button>
+                        <button type='submit' disabled={!isValid || isLoading} className="mt-5 lg:mt-0 border-2 border-blue-500 px-6 py-2 rounded-full text-blue-500 font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300">Login</button>
                     </form>
                 </div>
             </section>

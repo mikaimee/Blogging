@@ -23,3 +23,25 @@ export const getSinglePost = async ({slug}) => {
         throw new Error (err.message)
     }
 }
+
+export const createNewPost = async({token, title, summary, body, slug}) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const {data} = await axios.post('http://localhost:8000/post', {
+        title, 
+        summary,
+        body,
+        slug,
+        }, config)
+        return data
+    }
+    catch(err) {
+        if (err.response && err.response.data.message) 
+            throw new Error(err.response.data.message)
+        throw new Error (err.message)
+    }
+}
