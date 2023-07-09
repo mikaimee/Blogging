@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import ProfilePage from './pages/ProfilePage';
 import SinglePost from './pages/SinglePost'
 import NewPost from './pages/NewPost'
+import Admin from './pages/Admin/Admin';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage/>} />
           <Route path="/blog/:slug" element={<SinglePost />} />
           <Route path="/newPost" element={<NewPost />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
         <Toaster/>
     </div>

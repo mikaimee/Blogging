@@ -16,6 +16,8 @@ const Header = () => {
         dispatch(logout())
     }
 
+    console.log(userState.userInfo.isAdmin)
+
     return (
         <section className="sticky top-0 left-0 right-0 z-50 bg-pink-200">
             <header className="container mx-auto px-5 flex justify-between py-4 items-center">
@@ -25,6 +27,16 @@ const Header = () => {
                 <div>
                     {userState.userInfo ? (
                         <div className="text-white items-center gap-y-5 lg:text-dark-soft flex flex-col lg:flex-row gap-x-2 font-semibold">
+                            {/* if the user is an Admin, get adminPage otherwise null */}
+                            {userState.userInfo.isAdmin ? (
+                                <button 
+                                    type='button'
+                                    className="mt-5 lg:mt-0 px-5 py-2 rounded-full text-pink-300 font-semibold hover:text-pink-400 transition-all duration-400"
+                                    onClick={() => navigate("/admin")}
+                                >
+                                    Admin Page
+                                </button>
+                            ): null}
                             <button 
                                 type='button'
                                 className="mt-5 lg:mt-0 px-5 py-2 rounded-full text-pink-300 font-semibold hover:text-pink-400 transition-all duration-400"
