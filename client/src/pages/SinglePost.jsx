@@ -54,12 +54,12 @@ const SinglePost = () => {
                     <div className="mt-4 prose prose-sm sm:prose-base">
                         {body}
                     </div>
-                    <CommentBox 
+                    {/* <CommentBox 
                         comments = {data?.comments}
                         className="mt-10"
                         loggedInUserId = {userState?.userInfo?._id}
                         postSlug = {slug}
-                    />
+                    /> */}
                 </div>
             </div>
         </Layout>

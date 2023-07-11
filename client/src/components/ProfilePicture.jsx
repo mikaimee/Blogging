@@ -20,7 +20,7 @@ const ProfilePicture = ({avatar}) => {
                     id="profilePicture"
                 />
             </div>
-            <button>Delete</button>
+            <button>Delete Image</button>
         </div>
     )
 }

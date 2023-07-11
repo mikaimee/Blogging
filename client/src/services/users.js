@@ -67,3 +67,32 @@ export const updateProfile = async ({ token, userData }) => {
         throw new Error(error.message);
     }
 };
+
+export const getAllUsers = async () => {
+    try {
+        const { data } = await axios.get('http://localhost:8000/user')
+        return data
+    }
+    catch(err) {
+        if (err.response && err.response.data.message) 
+            throw new Error(err.response.data.message)
+        throw new Error (err.message)
+    }
+}
+
+export const deleteUser = async ({_id, token}) => {
+    try {
+        const config = {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+        };
+        const { data } = await axios.delete('http://localhost:8000/user', config)
+        return data
+    }
+    catch(err) {
+        if (err.response && err.response.data.message) 
+            throw new Error(err.response.data.message)
+        throw new Error (err.message)
+    }
+}
