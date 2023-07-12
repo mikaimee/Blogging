@@ -50,8 +50,8 @@ const getOnePost = async (req, res) => {
 const createPost = async (req, res) => {
     try {
         const post = new Post({
-            title: "sample title",
-            summary: "sample summary",
+            title: req.body.title,
+            summary: req.body.summary,
             body: {
                 type: "doc",
                 content: []

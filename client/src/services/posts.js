@@ -45,3 +45,20 @@ export const createNewPost = async({token, title, summary, body, slug}) => {
         throw new Error (err.message)
     }
 }
+
+export const deletePost = async ({slug, token}) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const {data} = await axios.delete(`http://localhost:8000/post/${slug}`, config)
+        return data
+    }
+    catch(err) {
+        if (err.response && err.response.data.message) 
+            throw new Error(err.response.data.message)
+        throw new Error (err.message)
+    }
+}
