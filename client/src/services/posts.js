@@ -62,3 +62,23 @@ export const deletePost = async ({slug, token}) => {
         throw new Error (err.message)
     }
 }
+
+// token parameter for authorization and likes + slug parameters to specify the data to be updated
+export const updatePostLike = async({token, likes, slug}) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const {data} = await axios.patch(`http://localhost:8000/post/${slug}/likes`, {
+        likes
+        }, config)
+        return data
+    }
+    catch(err) {
+        if (err.response && err.response.data.message) 
+            throw new Error(err.response.data.message)
+        throw new Error (err.message)
+    }
+}

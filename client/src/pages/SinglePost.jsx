@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getAllPosts, getSinglePost, deletePost } from '../services/posts'
+import { getAllPosts, getSinglePost, deletePost, updatePostLike } from '../services/posts'
 import { useSelector } from 'react-redux'
 import parse from 'html-react-parser'
 import CommentBox from '../components/comments/CommentBox'
@@ -20,6 +20,8 @@ const SinglePost = () => {
     const {slug} = useParams()
     const userState = useSelector((state) =>state.user)
     const [body, setBody] = useState(null)
+    const [likes, setLikes] = useState(0)
+    const [isLoadingLikes, setIsLoadingLikes] = useState(false)
     // get QueryClient from the context
     const queryClient = useQueryClient()
     const navigate = useNavigate()
@@ -64,6 +66,25 @@ const SinglePost = () => {
         mutateDeletePost({slug, token})
     }
 
+    const mutateUpdateLikes = useMutation(updatePostLike, {
+        onSuccess: (data) => {
+            // Update the likes state with updated value
+            setLikes(data.likes)
+        },
+        onError: (error) => {
+            toast.error(error.message)
+            console.log(error)
+        }
+    })
+
+    const handleLikes = () => {
+        mutateUpdateLikes.mutate({
+            slug,
+            token: userState.userInfo.token,
+            likes: likes + 1
+        })
+    }
+
     // console.log(data.user._id)
     // console.log(userState.userInfo._id, "from token")
 
@@ -92,6 +113,16 @@ const SinglePost = () => {
                 </div>
                 <div>
                     <h1 className="text-xl font-medium font-roboto mt-4 text-dark-hard md:text-[26px]">{data?.title}</h1>
+                    <div>
+                        <span>{data?.likes ?? 0} likes</span>
+                        <button
+                            onClick={handleLikes}
+                            disabled={mutateUpdateLikes.isLoading}
+                        >
+                            {mutateUpdateLikes.isLoading ? 'Loading...' : 'Add a Like'}
+                        </button>
+                    </div>
+                    
                     <div className="mt-4 prose prose-sm sm:prose-base">
                         {body}
                     </div>
