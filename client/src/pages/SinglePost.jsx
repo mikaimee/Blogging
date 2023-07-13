@@ -64,6 +64,9 @@ const SinglePost = () => {
         mutateDeletePost({slug, token})
     }
 
+    // console.log(data.user._id)
+    // console.log(userState.userInfo._id, "from token")
+
     return (
         <Layout>
             <div className="container mx-auto max-w-5xl flex flex-col px-5 py-5 lg:flex-row lg:gap-x-5 lg:items-start">
@@ -75,7 +78,8 @@ const SinglePost = () => {
                     ))}
                 </div> */}
                 <div>
-                    {userState.userInfo.token ? (
+                    {/* Only person who made the post or admin can delete post */}
+                    {data?.user?._id === userState.userInfo?._id || userState.userInfo?.isAdmin ? (
                         <button
                         type='button'
                         onClick={() => {

@@ -114,14 +114,22 @@ const deletePost = async (req, res) => {
     }
 }
 
-const likePost = async(req, res) => {
-    if (!req?.params?.id) return res.status(400).json({'message': 'Post ID required'})
-
-    const post = await Post.findById(req?.params?.id)
-    const addLikePost = await Post.findByIdAndUpdate(req?.params?.id, {
-        likes: post.likes + 1
-    }, {new: true})
-    res.json(addLikePost)
+const likePost = async (req, res) => {
+    try {
+        const post = await Post.findOne({slug: req.params.slug})
+        if (!post) {
+            return res.status(404).json({message: "Post is not found"})
+        }
+        post.likes += 1
+        const updateLikesPost = await post.save()
+        return res.status(200).json({
+            updateLikesPost,
+            message: "+1 Like"
+        })
+    }
+    catch (error) {
+        res.status(500).json({message: error.message})
+    }
 }
 
 module.exports = {
