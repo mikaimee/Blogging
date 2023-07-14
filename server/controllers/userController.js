@@ -1,7 +1,8 @@
+const { uploadPic } = require('../middleware/uploadingPic')
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
-// const uP = require('../middleware/uploadingPic')
-// const fileR = require('../config/fileRemover')
+const uP = require('../middleware/uploadingPic')
+const fileR = require('../config/fileRemover')
 
 const allUsers = async (req, res) => {
     const users = await User.find()
@@ -117,55 +118,53 @@ const updateProfile = async (req, res) => {
     }
 }
 
-// const updateProfilePic = async(req, res) => {
-//     try{
-//         const upload = uploadPicture.uploadPic.single('profilePicture')
+const updateProfilePic = async (req, res) => {
+    try {
+        // single('profilePicture') used to handle the file upload which is invoked by bassing the req and res objects as arguments, along with error-first callback function
+        uploadPic.single('profilePicture')(req, res, async (err) => {
+            // err parameter is checked to determine if an error occured dueing the upload process
+            // if present, it is logged and function returns early
+            if (err) {
+                console.log(err.message)
+                return
+            }
 
-//         upload(req, res, async function (err) {
-//             if (err) {
-//                 console.log(err.message)
-//             }
-//             else {
-//                 if (req.file) {
-//                     const updatedUser = await User.findByIdAndUpdate(req.user._id, {
-//                         avatar: req.file.filename
-//                     }, {new: true})
-//                     res.json({
-//                         _id: updatedUser._id,
-//                         avatar: updatedUser.avatar,
-//                         username: updatedUser.username,
-//                         password: updatedUser.password,
-//                         email: updatedUser.email,
-//                         isAdmin: updatedUser.isAdmin,
-//                         token: await updatedUser.getSigninToken(),
-//                         message: `${updatedUser.username} updated` 
-//                     })
-//                 }
-//                 else {
-//                     let filename
-//                     let updatedUser = await User.findById(req.user._id)
-//                     filename = updatedUser.avatar
-//                     updateUser.avatar = "" // if there's no file, reset
-//                     await updatedUser.save()
-//                     fileR.fileRemover(filename)
-//                     res.json({
-//                         _id: updatedUser._id,
-//                         avatar: updatedUser.avatar,
-//                         username: updatedUser.username,
-//                         password: updatedUser.password,
-//                         email: updatedUser.email,
-//                         isAdmin: updatedUser.isAdmin,
-//                         token: await updatedUser.getSigninToken(),
-//                         message: `${updatedUser.username} updated`
-//                     })
-//                 }
-//             }
-//         })
-//     }
-//     catch (err) {
-//         console.log(err)
-//     }
-// }
+            // If no error
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user._id,
+                { avatar: req.file?.filename || ''},
+                { new: true }
+            )
+
+            // Checks if 'req.file' exists, indicating that new file was uploaded
+            // If exists, code attempts the removal of previous avatar file
+            if (req.file) {
+                try {
+                    await fileR.fileRemover(updatedUser.avatar)
+                    console.log(`File removed: ${updatedUser.avatar}`)
+                }
+                catch(error){
+                    console.error(`Error removing file: ${updatedUser.avatar}`, error);
+                }
+            }
+
+            // JSON response is sent back to the client, containing the updated user's information with the new avatar filename
+            res.json({
+                _id: updatedUser._id,
+                avatar: updatedUser.avatar,
+                username: updatedUser.username,
+                password: updatedUser.password,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin,
+                token: await updatedUser.getSigninToken(),
+                message: `${updatedUser.username} avatar updated`
+            })
+        })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
 
 const deleteUser = async (req, res) => {
     if (!req?.body?._id) {
@@ -183,6 +182,6 @@ module.exports = {
     allUsers,
     oneUser,
     updateProfile,
-    // updateProfilePic,
+    updateProfilePic,
     deleteUser
 }

@@ -12,6 +12,9 @@ router.route('/:slug')
     .patch(protection.authProtect, postController.updatePost)
     .delete(protection.authProtect, postController.deletePost)
 
+router.route('/:slug/photo')
+    .patch(protection.authProtect, postController.updatePostPhoto)
+
 router.route('/:slug/likes')
     .patch(protection.authProtect, postController.likePost)
 

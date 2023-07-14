@@ -1,6 +1,8 @@
 const Comment = require('../models/Comment')
 const Post = require('../models/Post')
 const { v4: uuid } = require('uuid')
+const { uploadPic } = require('../middleware/uploadingPic')
+const fileR = require('../config/fileRemover')
 
 const getAllPosts = async(req, res) => {
     try{
@@ -96,6 +98,52 @@ const updatePost = async (req, res) => {
     }
 }
 
+const updatePostPhoto = async (req, res) => {
+    try {
+        uploadPic.single('postPicture')(req, res, async (err) => {
+            if (err) {
+                console.log(err.message)
+                return
+            }
+
+            const slug = req.params.slug
+            const updatedPost = await Post.findOneAndUpdate(
+                { slug },
+                { photo: req.file?.filename || ''},
+                { new: true }
+            )
+
+            if (req.file) {
+                try {
+                    await fileR.fileRemover(updatedPost.photo)
+                    console.log(`File removed: ${updatedPost.photo}`)
+                }
+                catch(error){
+                    console.error(`Error removing file: ${updatedPost.photo}`, error);
+                }
+            }
+
+            res.json({
+                _id: updatedPost._id,
+                title: updatedPost.title,
+                summary: updatedPost.summary,
+                body: updatedPost.body,
+                slug: updatedPost.slug,
+                photo: updatedPost.photo,
+                likes: updatedPost.likes,
+                tags: updatedPost.tags,
+                categories: updatedPost.categories,
+                message: `${updatedPost.username} avatar updated`
+            })
+        })
+    }
+    catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Internal Server Error' })
+    }
+}
+
+
 const deletePost = async (req, res) => {
     try{
         const post = await Post.findOneAndDelete({slug: req.params.slug})
@@ -139,5 +187,6 @@ module.exports = {
     createPost,
     updatePost,
     deletePost,
-    likePost
+    likePost,
+    updatePostPhoto
 }

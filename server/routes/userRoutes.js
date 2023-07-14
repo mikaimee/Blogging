@@ -11,6 +11,9 @@ router.route('/')
 router.route('/profile')
     .get(protection.authProtect, userController.oneUser)
 
+router.route('/profilePic')
+    .patch(protection.authProtect, userController.updateProfilePic)
+
 // router.route('/profilePic')
 //     .put(userController.updateProfilePic)
 
