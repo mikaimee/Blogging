@@ -1,5 +1,10 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
+// Provides a form for adding new comments
+
+/* Prop list: 'btnLabel' (label for the submit button), 'formSubmitHandler' (function to handle form submission), 'formCancelHandler' (optional function to handle canceling form submission),
+ 'initialText' (optional initial text for text area), and 'loading' (boolean indication whether the form is in loading state) */
 const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = null, initialText="", loading=false}) => {
 
     const [value, setValue] = useState(initialText)
@@ -8,6 +13,12 @@ const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = null, init
         e.preventDefault()
         formSubmitHandler(value)
         setValue("")
+    }
+
+    const handleCancel = () => {
+        if (formCancelHandler) {
+            formCancelHandler()
+        }
     }
 
     return (
@@ -22,7 +33,12 @@ const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = null, init
                 />
                 <div className="flex flex-col-reverse gap-y-2 items-center gap-x-2 pt-2 min-[420px]:flex-row">
                     {formCancelHandler && (
-                        <button className="px-6 py-2.5 rounded-lg border border-red-500 text-red-500">cancel</button>
+                        <button 
+                            className="px-6 py-2.5 rounded-lg border border-red-500 text-red-500"
+                            onClick={handleCancel}
+                        >
+                            cancel
+                        </button>
                     )}
                     <button 
                         className="px-6 py-2.5 rounded-lg bg-primary text white font-semibold disabled:opacity-70 disabled:cursor-not-allowed"
@@ -33,9 +49,18 @@ const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = null, init
                     </button>
                 </div>
             </div>
-            
         </form>
     )
+}
+
+// Help ensure that props passed to a component have the expected types and helps catch errors during development
+AddComment.propTypes = {
+    btnLabel: PropTypes.string.isRequired,
+    formSubmitHandler: PropTypes.func.isRequired,
+    formCancelHandler: PropTypes.func.isRequired,
+    initialText: PropTypes.string,
+    loading: PropTypes.bool
+
 }
 
 export default AddComment

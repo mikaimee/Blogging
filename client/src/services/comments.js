@@ -1,7 +1,9 @@
 import axios from "axios";
 
+// Accepts an object containing the necessary parameters: token, slug, body, parent, replyOnUser
 export const newComment = async({token, slug, body, parent, replyOnUser}) => {
     try {
+        // Holds the authorization header with provided token
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -1,10 +1,16 @@
 import React from 'react'
 import AddComment from './AddComment'
 
+// receives several props, invluding 'comment' (the comment object), 'loggedInUserId' (ID of logged user), 'affectedComment' (currently affected comment), 
+// setAffectedComment (function to update affected comment), 'addComment' (function to add new comment), 'updatedComment' (function to update comment),
+// 'replies' (array of reply comments)
 const Comment = ({comment, loggedInUserId, affectedComment, setAffectedComment, addComment, parentId = null, updateComment, deleteComment, replies}) => {
 
+    // See if user is logged in 
     const isUserLoggedIn = Boolean(loggedInUserId)
+    // If the comment belongs to the logged user
     const commentBelongsToUser = loggedInUserId === comment.user._id
+    // If comment is currently being edited or replied to based on the 'affectedComment' state
     const isReplying = affectedComment && affectedComment.type === "replying" && affectedComment._id === comment._id
     const isEditing = affectedComment && affectedComment.type === "editing" && affectedComment._id === comment._id
     const repliedCommentId = parentId ? parentId : comment._id

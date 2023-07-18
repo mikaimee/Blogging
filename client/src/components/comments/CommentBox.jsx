@@ -5,10 +5,12 @@ import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import {useNavigate} from 'react-router-dom'
 
 const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     const queryClient = useQueryClient()
+    const navigate = useNavigate()
     const userState = useSelector((state) => state.user)
     const [affectedComment, setAffectedComment] = useState(null)
 
@@ -54,6 +56,12 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
     })
 
     const addCommentHandler = (value, parent = null, replyOnUser = null) => {
+        if (!loggedInUserId) {
+            toast.error("Please login or register to commet")
+            navigate("/login")
+            return
+        }
+
         mutateNewComment({
             body: value,
             parent, 
@@ -63,6 +71,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
         })
         setAffectedComment(null)
     }
+
 
     const updateCommentHandler = (value, commentId) => {
         mutateUpdateComment({
@@ -82,16 +91,15 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     return (
         <div className={`${className}`}>
-            <p>Add Comment Box HERE</p>
             <AddComment 
-                btnLabel = "Send"
+                btnLabel = "Comment"
                 formSubmitHandler = {(value) => addCommentHandler(value)}
                 loading= {isLoadingNewComment}
             />
             <div className="space-y-4 mt-8">
-                <p>Mapping all comments OF POST here</p>
-                <p>The problem now is that when everything is refreshed, the comment mapping has an error</p>
-                {/* {comments.map((comment) => (
+                {/* comments && comments.map() ensures that the comments array exists 
+                and is not 'null' or 'undefined' before attempting to map over it */}
+                {comments && comments.length > 0 && comments.map((comment) => (
                     <Comment 
                         key={comment._id}
                         comment={comment}
@@ -103,7 +111,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
                         deleteComment = {deleteCommentHandler}
                         replies={comment.replies}
                     />
-                ))} */}
+                ))}
             </div>
         </div>
     )
