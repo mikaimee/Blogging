@@ -1,5 +1,6 @@
 const Comment = require('../models/Comment')
 const Post = require('../models/Post')
+const User = require('../models/User')
 const { v4: uuid } = require('uuid')
 const { uploadPic } = require('../middleware/uploadingPic')
 const fileR = require('../config/fileRemover')
@@ -180,6 +181,21 @@ const likePost = async (req, res) => {
     }
 }
 
+const countPostByUser = async (req, res) => {
+    try {
+        const userId = req.params.userId
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(400).json({messag: 'User is not found'})
+        }
+        const postCount = await Post.countDocuments({ user: userId })
+        res.json({count: postCount})
+    }
+    catch (error) {
+        res.status(500).json({message: error.message})
+    }
+}
+
 module.exports = {
     getAllPosts,
     // getSinglePost,
@@ -188,5 +204,6 @@ module.exports = {
     updatePost,
     deletePost,
     likePost,
-    updatePostPhoto
+    updatePostPhoto,
+    countPostByUser
 }

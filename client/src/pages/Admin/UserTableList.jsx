@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {deleteUser} from '../../services/users'
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {toast} from 'react-hot-toast'
 import { useSelector } from "react-redux";
+import { getUserPostCount } from '../../services/posts';
 
-const PostInfo = ({user, className}) => {
+const UserTableList = ({user, className}) => {
 
     const queryClient = useQueryClient();
     const userState = useSelector((state) => state.user)
+    const [postCount, setPostCount] = useState(0)
 
     const {mutate: mutateDeleteUser, isLoading: isLoadingDeleteUser} = 
         useMutation({
@@ -31,11 +33,28 @@ const PostInfo = ({user, className}) => {
         mutateDeleteUser({_id, token})
     }
 
+    useEffect(() => {
+        const fetchPostCount = async () => {
+            try {
+                const userId = user._id
+                const count = await getUserPostCount(userId, userState.userInfo.token)
+                setPostCount(count)
+            }
+            catch(error) {
+                toast.error(error.message)
+                setPostCount(0)
+            }
+        }
+        fetchPostCount()
+    }, [user._id, userState.userInfo.token])
+
     return (
         <tr>
             <td>{user.username}</td>
             <td>{user.isAdmin ? (<p>Yes</p>) : (<p>No</p>)}</td>
-            <td> # </td>
+            <td> 
+                <p>{postCount}</p>
+            </td>
             <td>
                 <button 
                     disabled={isLoadingDeleteUser}
@@ -54,4 +73,4 @@ const PostInfo = ({user, className}) => {
     )
 }
 
-export default PostInfo
+export default UserTableList

@@ -82,3 +82,18 @@ export const updatePostLike = async({token, likes, slug}) => {
         throw new Error (err.message)
     }
 }
+
+export const getUserPostCount = async (userId, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const {data} = await axios.get(`http://localhost:8000/post/user/${userId}/count`, config)
+        return data.count
+    }
+    catch (error) {
+        throw new Error(error.message)
+    }
+}

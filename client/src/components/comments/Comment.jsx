@@ -21,7 +21,6 @@ const Comment = ({comment, loggedInUserId, affectedComment, setAffectedComment, 
             <div className="flex-1 flex flex-col">
                 <h5 className="font-bold text-dark-hard text-xs lg:text-sm">
                     {comment.user.username}
-                    author
                 </h5>
                 <span className="text-xs text-dark-light">
                     {new Date(comment.createdAt).toLocaleDateString("en-US", {
@@ -31,12 +30,10 @@ const Comment = ({comment, loggedInUserId, affectedComment, setAffectedComment, 
                         hour: "2-digit",
                         minute: "2-digit"
                     })}
-                    Date
                 </span>
                 {!isEditing && (
                     <p className="font-opensans mt-[10px] text-dark-light">
                         {comment.body}
-                        Comment Body
                     </p>
                 )}
                 {isEditing && (

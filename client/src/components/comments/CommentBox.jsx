@@ -29,7 +29,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     const {mutate: mutateUpdateComment, isLoading: isLoadingUpdateComment} = useMutation({
         mutationFn: ({token, body, commentId}) => {
-            return newComment({token, body, commentId})
+            return editComment({token, body, commentId})
         },
         onSuccess: () => {
             toast.success("Comment successful update")
@@ -43,7 +43,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     const {mutate: mutateDeleteComment, isLoading: isLoadingDeleteComment} = useMutation({
         mutationFn: ({token, commentId}) => {
-            return newComment({token, commentId})
+            return deleteComment({token, commentId})
         },
         onSuccess: () => {
             toast.success("Comment delete successful")
@@ -89,17 +89,22 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
         })
     }
 
+    const handleFormCancel = () => {
+        console.log("Form canceled")
+    }
+
     return (
         <div className={`${className}`}>
             <AddComment 
                 btnLabel = "Comment"
-                formSubmitHandler = {(value) => addCommentHandler(value)}
+                formSubmitHandler={(value) => addCommentHandler(value)}
+                formCancelHandler={handleFormCancel}
                 loading= {isLoadingNewComment}
             />
             <div className="space-y-4 mt-8">
                 {/* comments && comments.map() ensures that the comments array exists 
                 and is not 'null' or 'undefined' before attempting to map over it */}
-                {comments && comments.length > 0 && comments.map((comment) => (
+                {Array.isArray(comments) && comments.map((comment) => (
                     <Comment 
                         key={comment._id}
                         comment={comment}

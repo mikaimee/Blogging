@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 /* Prop list: 'btnLabel' (label for the submit button), 'formSubmitHandler' (function to handle form submission), 'formCancelHandler' (optional function to handle canceling form submission),
  'initialText' (optional initial text for text area), and 'loading' (boolean indication whether the form is in loading state) */
-const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = null, initialText="", loading=false}) => {
+const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = () => {}, initialText="", loading=false}) => {
 
     const [value, setValue] = useState(initialText)
 

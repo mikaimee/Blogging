@@ -18,4 +18,7 @@ router.route('/:slug/photo')
 router.route('/:slug/likes')
     .patch(protection.authProtect, postController.likePost)
 
+router.route('/user/:userId/count')
+    .get(protection.authProtect, postController.countPostByUser)
+
 module.exports = router
