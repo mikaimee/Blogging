@@ -20,7 +20,8 @@ const SinglePost = () => {
     const {slug} = useParams()
     const userState = useSelector((state) =>state.user)
     const [body, setBody] = useState(null)
-    const [likes, setLikes] = useState(0)
+    const [likes, setLikes] = useState([]);
+    const [likesCount, setLikesCount] = useState(0)
     const [isLoadingLikes, setIsLoadingLikes] = useState(false)
     // get QueryClient from the context
     const queryClient = useQueryClient()
@@ -66,27 +67,42 @@ const SinglePost = () => {
         mutateDeletePost({slug, token})
     }
 
-    const mutateUpdateLikes = useMutation(updatePostLike, {
-        onSuccess: (data) => {
-            // Update the likes state with updated value
-            setLikes(data.likes)
-        },
-        onError: (error) => {
-            toast.error(error.message)
-            console.log(error)
+    const mutateUpdateLikes = useMutation(
+        (data) => updatePostLike({ 
+            ...data, 
+            userId: userState.userInfo?._id, 
+            likes: likes ?? [], 
+            likesCount: likesCount ?? 0, 
+            token: userState.userInfo?.token, 
+            slug
+        }), // Pass both the likes array and likesCount
+        {
+            onSuccess: (data) => {
+                setLikes(data.likes);
+                setLikesCount(data.likesCount);
+            },
+            onError: (error) => {
+                toast.error(error.message);
+                console.log(error);
+            },
         }
-    })
+    );
 
     const handleLikes = () => {
-        mutateUpdateLikes.mutate({
-            slug,
-            token: userState.userInfo.token,
-            likes: likes + 1
-        })
-    }
-
-    // console.log(data.user._id)
-    // console.log(userState.userInfo._id, "from token")
+        if (!userState.userInfo) {
+            navigate('/login')
+            return
+        }
+        const userId = userState.userInfo._id;
+        // Check if the logged-in user has already liked the post
+        const userHasLiked = likes && likes.includes(userId);
+        if (userHasLiked) {
+            toast.error("You have already liked this post.");
+            return;
+        }
+        // Pass the userId to the mutation function
+        mutateUpdateLikes.mutate({userId});
+    };
 
     return (
         <Layout>
@@ -114,7 +130,9 @@ const SinglePost = () => {
                 <div>
                     <h1 className="text-xl font-medium font-roboto mt-4 text-dark-hard md:text-[26px]">{data?.title}</h1>
                     <div>
-                        <span>{data?.likes ?? 0} likes</span>
+                        <span>
+                            {data?.likesCount !== undefined ? `${data?.likesCount} ${data?.likesCount === 1 ? 'like' : 'likes'}` : 'Loading likes...'}
+                        </span>
                         <button
                             onClick={handleLikes}
                             disabled={mutateUpdateLikes.isLoading}

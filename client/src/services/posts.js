@@ -64,15 +64,16 @@ export const deletePost = async ({slug, token}) => {
 }
 
 // token parameter for authorization and likes + slug parameters to specify the data to be updated
-export const updatePostLike = async({token, likes, slug}) => {
+export const updatePostLike = async({token, likes, likesCount, slug, userId}) => {
     try {
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         };
-        const {data} = await axios.patch(`http://localhost:8000/post/${slug}/likes`, {
-        likes
+        const {data} = await axios.patch(`http://localhost:8000/post/${slug}/likes/${userId}`, {
+            likes,
+            likesCount
         }, config)
         return data
     }

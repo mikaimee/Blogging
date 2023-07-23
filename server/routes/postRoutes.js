@@ -15,7 +15,7 @@ router.route('/:slug')
 router.route('/:slug/photo')
     .patch(protection.authProtect, postController.updatePostPhoto)
 
-router.route('/:slug/likes')
+router.route('/:slug/likes/:userId')
     .patch(protection.authProtect, postController.likePost)
 
 router.route('/user/:userId/count')

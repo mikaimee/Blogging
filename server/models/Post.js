@@ -1,5 +1,12 @@
 const mongoose = require('mongoose')
 
+const likeSchmea = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
+})
+
 const PostSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -29,7 +36,8 @@ const PostSchema = new mongoose.Schema({
         required: true,
         ref: 'User'
     },
-    likes: {
+    likes: [likeSchmea], // Array of objects representing likes
+    likesCount: {
         type: Number,
         default: 0
     },

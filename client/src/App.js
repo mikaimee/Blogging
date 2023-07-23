@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import SinglePost from './pages/SinglePost'
 import NewPost from './pages/NewPost'
 import Admin from './pages/Admin/Admin';
+import EditPost from './pages/EditPost';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProfilePage/>} />
           <Route path="/blog/:slug" element={<SinglePost />} />
+          <Route path="/blog/:slug/edit" element={<EditPost />} />
           <Route path="/newPost" element={<NewPost />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

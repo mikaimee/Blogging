@@ -165,11 +165,25 @@ const deletePost = async (req, res) => {
 
 const likePost = async (req, res) => {
     try {
+        const userId = req.params.userId
         const post = await Post.findOne({slug: req.params.slug})
         if (!post) {
             return res.status(404).json({message: "Post is not found"})
         }
-        post.likes += 1
+
+        // Check if the likes array exists and initialize it if needed
+        if (!post.likes) {
+            post.likes = []
+        }
+
+        // Check if the user's ID is already in the array of users who liked the post
+        const existingLike = post.likes.find((like) => like.user.toString() === userId)
+        if (existingLike) {
+            return res.status(400).json({message: "You have already left a like"})
+        }
+
+        post.likes.push({user: userId}) // Add userId to the array
+        post.likesCount += 1 // Increment likes 
         const updateLikesPost = await post.save()
         return res.status(200).json({
             updateLikesPost,
