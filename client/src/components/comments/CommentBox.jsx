@@ -14,6 +14,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
     const userState = useSelector((state) => state.user)
     const [affectedComment, setAffectedComment] = useState(null)
     const [visibleComments, setVisibleComments] = useState(2)
+    const [commentFormCanceled, setCommentFormCanceled] = useState(false)
 
     const {mutate: mutateNewComment, isLoading: isLoadingNewComment} = useMutation({
         mutationFn: ({token, body, slug, parent, replyOnUser}) => {
@@ -92,6 +93,8 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     const handleFormCancel = () => {
         console.log("Form canceled")
+        setAffectedComment(null)
+        setCommentFormCanceled(true)
     }
 
     const handleSeeMoreComments = () => {

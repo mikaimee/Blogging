@@ -19,6 +19,7 @@ const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = () => {}, 
         if (formCancelHandler) {
             formCancelHandler()
         }
+        setValue("")
     }
 
     return (
@@ -35,9 +36,10 @@ const AddComment = ({btnLabel, formSubmitHandler, formCancelHandler = () => {}, 
                     {formCancelHandler && (
                         <button 
                             className="px-6 py-2.5 rounded-lg border border-red-500 text-red-500"
+                            type='button'
                             onClick={handleCancel}
                         >
-                            cancel
+                            Cancel
                         </button>
                     )}
                     <button 
