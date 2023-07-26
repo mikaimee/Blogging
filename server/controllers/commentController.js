@@ -40,7 +40,8 @@ const createComment = async(req, res) => {
 
 const updateComment = async(req, res) => {
     try {
-        const {id, body} = req.body
+        const {body} = req.body
+        const {id} = req.params
             if (!id || !body) {
                 return res.status(400).json({message: 'All fields are required'})
             }

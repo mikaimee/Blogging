@@ -38,13 +38,7 @@ export const editComment = async({token, body, commentId}) => {
     catch(err) {
         if (err.response && err.response.data.message) 
             throw new Error(err.response.data.message)
-        else if (err.message) {
-            throw new Error(err.message)
-        }
-        else {
-            throw new Error ('An unknown error occured')
-        }
-
+        throw new Error (err.message)
     }
 }
 

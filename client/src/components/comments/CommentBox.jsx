@@ -78,7 +78,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
         mutateUpdateComment({
             token: userState.userInfo.token,
             body: value,
-            commentId
+            commentId: commentId
         })
         setAffectedComment(null)
     }
