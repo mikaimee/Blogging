@@ -102,7 +102,13 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
 
     // Checks if 'comments' prop is defined and an array before using slice
     const visibleCommentsList =
-    Array.isArray(comments) && comments.slice(0, visibleComments);
+    Array.isArray(comments) ? 
+    comments
+        .filter((comment) => comment.parent === null)
+        .slice(0, visibleComments) 
+    : [];
+
+    // console.log(comments)
 
 
     return (
