@@ -2,11 +2,16 @@ const Comment = require('../models/Comment')
 const Post = require('../models/Post')
 
 const getAllComments = async(req, res) => {
-    const comments = await Comment.find().lean()
-    if (!comments?.length) {
-        return res.status(400).json({message: 'No comments are foud'})
+    try {
+        const comments = await Comment.find().lean()
+        if (!comments?.length) {
+            return res.status(404).json({message: 'No comments are foud'})
+        }
+        res.json(comments)
     }
-    res.json(comments)
+    catch (error) {
+        res.status(500).json({message: 'Error fetching comments'})
+    }
 }
 
 const createComment = async(req, res) => {
@@ -29,41 +34,44 @@ const createComment = async(req, res) => {
         return res.json(savedComment)
     }
     catch (error) {
-        res.status(400).json({message: error.message})
+        res.status(500).json({message: 'Error creating comment'})
     }
 }
 
 const updateComment = async(req, res) => {
-    const {id, body} = req.body
-    if (!id || !body) {
-        return res.status(400).json({message: 'All fields are required'})
+    try {
+        const {id, body} = req.body
+            if (!id || !body) {
+                return res.status(400).json({message: 'All fields are required'})
+            }
+
+            const comment = await Comment.findById(req?.params?.id).exec()
+            if (!comment) {
+                return res.status(400).json({message: 'Comment is not found'})
+            }
+            comment.body = body
+
+            const updatedComment = await comment.save()
+
+            res.json({ message: `Your comment with id of ${updatedComment.id} has been updated` })
     }
-
-    const comment = await Comment.findById(req?.params?.id).exec()
-    if (!comment) {
-        return res.status(400).json({message: 'Comment is not found'})
+    catch (error) {
+        res.status(500).json({message: 'Error updating comment'})
     }
-    comment.body = body
-
-    const updatedComment = await comment.save()
-
-    res.json({ message: `Your comment with id of ${updatedComment.id} has been updated` })
 }
 
 const deleteComment = async (req, res) => {
-    const {id} = req.body
-    if (!id) {
-        return res.status(400).json({ message: 'Comment ID Required' })
+    try {
+        const comment = await Comment.findById(req?.params?.id).exec()
+        if (!comment) {
+            return res.status(400).json({ message: 'Comment not found' })
+        }
+        const deletedComment = await comment.deleteOne()
+        res.json({message:`Comment: ${deletedComment.title} with ID ${deletedComment._id} deleted`})
     }
-
-    const comment = await Comment.findById(req?.params?.id).exec()
-    if (!comment) {
-        return res.status(400).json({ message: 'Comment not found' })
+    catch(error) {
+        res.status(500).json({message: 'Error deleting comment'})
     }
-
-    const deletedComment = await comment.deleteOne()
-
-    res.json({message:`Comment: ${deletedComment.title} with ID ${deletedComment._id} deleted`})
 }
 
 module.exports = {

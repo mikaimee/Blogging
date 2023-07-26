@@ -13,6 +13,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
     const navigate = useNavigate()
     const userState = useSelector((state) => state.user)
     const [affectedComment, setAffectedComment] = useState(null)
+    const [visibleComments, setVisibleComments] = useState(2)
 
     const {mutate: mutateNewComment, isLoading: isLoadingNewComment} = useMutation({
         mutationFn: ({token, body, slug, parent, replyOnUser}) => {
@@ -93,6 +94,17 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
         console.log("Form canceled")
     }
 
+    const handleSeeMoreComments = () => {
+        setVisibleComments((prevVisibleComments) => 
+            Math.min(prevVisibleComments + 2, comments.length)
+        )
+    };
+
+    // Checks if 'comments' prop is defined and an array before using slice
+    const visibleCommentsList =
+    Array.isArray(comments) && comments.slice(0, visibleComments);
+
+
     return (
         <div className={`${className}`}>
             <AddComment 
@@ -104,7 +116,7 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
             <div className="space-y-4 mt-8">
                 {/* comments && comments.map() ensures that the comments array exists 
                 and is not 'null' or 'undefined' before attempting to map over it */}
-                {Array.isArray(comments) && comments.map((comment) => (
+                {Array.isArray(visibleCommentsList) && visibleCommentsList.map((comment) => (
                     <Comment 
                         key={comment._id}
                         comment={comment}
@@ -115,9 +127,17 @@ const CommentBox = ({className, loggedInUserId, comments, postSlug}) => {
                         updateComment = {updateCommentHandler}
                         deleteComment = {deleteCommentHandler}
                         replies={comment.replies}
+                        isDirectChild={false}
                     />
                 ))}
             </div>
+
+            {Array.isArray(comments) && comments.length > visibleComments && (
+                <button onClick={handleSeeMoreComments}>See more comments</button>
+            )}
+            {visibleComments > 2 && (
+                <button onClick={() => setVisibleComments(2)}>Hide comments</button>
+            )}
         </div>
     )
 }

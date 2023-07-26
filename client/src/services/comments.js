@@ -31,15 +31,20 @@ export const editComment = async({token, body, commentId}) => {
                 Authorization: `Bearer ${token}`,
             },
         };
-        const {data} = await axios.patch(`http://localhost:8000/comment/${commentId}`, {
-        body
-        }, config)
+        const {data} = await axios.patch(`http://localhost:8000/comment/${commentId}`, 
+        { body }, config)
         return data
     }
     catch(err) {
         if (err.response && err.response.data.message) 
             throw new Error(err.response.data.message)
-        throw new Error (err.message)
+        else if (err.message) {
+            throw new Error(err.message)
+        }
+        else {
+            throw new Error ('An unknown error occured')
+        }
+
     }
 }
 

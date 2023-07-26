@@ -1,21 +1,25 @@
 const mongoose = require('mongoose')
 
 const CommentSchema = new mongoose.Schema({
+    // Indicates the user who created the comment
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
+    // Comment text
     body: {
         type: String,
         required: true
     },
+    // Indicates the post to which the comment belongs
     postId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
         required: true
     },
     // Tells if comment is the main comment or reply
+    // If reply, will hold the ObjectId of the parent comment
     parent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
