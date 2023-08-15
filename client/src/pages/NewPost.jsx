@@ -17,7 +17,6 @@ import Bold from '@tiptap/extension-bold'
 const NewPost = () => {
 
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const userState = useSelector((state) => state.user)
 
     const {mutate: createPost, isLoading} = useMutation({
@@ -37,30 +36,32 @@ const NewPost = () => {
 
     const [title, setTitle] = useState('')
     const [summary, setSummary] = useState('')
-    const [editorContent, setEditorContent] = useState('');
 
     const editor = useEditor({
         extensions: [Document, Heading, Paragraph, Text, Bold], 
-        content: editorContent,
-        onUpdate: ({ editor }) => {
-            const htmlContent = editor.getHTML();
-            setEditorContent(htmlContent); 
-        },
     });
 
     const submitHandler = (e) => {
         e.preventDefault()
-        if (!title || !summary || !editorContent) {
+        if (!title || !summary || !editor) {
             toast.error('Please fill in all required fields')
             return
         }
+
         const token = userState.userInfo.token
+        const editorContent = editor.getJSON()
+        const body = {
+            type: 'doc',
+            content: editorContent,
+        };
+
+        console.log('Editor Content: ', editorContent)
 
         createPost({
             token,
             title,
             summary,
-            body: editorContent
+            body
         })
     }
 

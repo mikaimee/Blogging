@@ -98,3 +98,18 @@ export const getUserPostCount = async (userId, token) => {
         throw new Error(error.message)
     }
 }
+
+export const updatePost = async ({updatedData, slug, token}) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const {data} = await axios.patch(`http://localhost:8000/post/${slug}`, updatedData, config)
+        return data
+    }
+    catch (error) {
+        throw new Error(error.message)
+    }
+}

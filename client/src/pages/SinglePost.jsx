@@ -104,6 +104,11 @@ const SinglePost = () => {
         mutateUpdateLikes.mutate({userId});
     };
 
+    const handleEditClick = () => {
+        const editPageUrl = `/blog/${data.slug}/edit`
+        navigate(editPageUrl)
+    }
+
     return (
         <Layout>
             <div className="container mx-auto max-w-5xl flex flex-col px-5 py-5 lg:flex-row lg:gap-x-5 lg:items-start">
@@ -117,14 +122,19 @@ const SinglePost = () => {
                 <div>
                     {/* Only person who made the post or admin can delete post */}
                     {data?.user?._id === userState.userInfo?._id || userState.userInfo?.isAdmin ? (
-                        <button
-                        type='button'
-                        onClick={() => {
-                            deleteHandler({slug: data?.slug, token: userState.userInfo.token})
-                        }}
-                    >
-                        Delete
-                    </button>
+                        <div>
+                            <button
+                                type='button'
+                                onClick={() => {
+                                    deleteHandler({slug: data?.slug, token: userState.userInfo.token})
+                                }}
+                            >
+                                Delete
+                            </button>
+                            <Link to={`/blog/${data?.slug}/edit`}>
+                                Edit
+                            </Link>
+                        </div>
                     ): null}
                 </div>
                 <div>
