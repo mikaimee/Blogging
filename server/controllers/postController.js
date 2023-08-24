@@ -80,7 +80,7 @@ const updatePost = async (req, res) => {
         }
 
         post.title = req.body.title || post.title
-        post.summary = req.body.sumary || post.sumary
+        post.summary = req.body.summary || post.summary
         post.body = req.body.body || post.body
         post.slug = req.body.slug || post.slug
         post.tags = req.body.tags || post.tags

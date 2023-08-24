@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getSinglePost, updatePost } from '../services/posts'
 import { toast } from 'react-hot-toast'
 import jsonToHtml from '../utils/JsonToHtml'
@@ -16,6 +16,8 @@ const EditPost = () => {
     const [editedTitle, setEditedTitle] = useState('');
     const [editedSummary, setEditedSummary] = useState('');
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         getSinglePost({slug})
             .then((data) => {
@@ -23,8 +25,8 @@ const EditPost = () => {
                 setEditedTitle(data.title)
                 setEditedSummary(data.summary)
             })
-            .catch((error) = {
-                
+            .catch((error) => {
+                console.error('Error fetching post data', error)
             })
     }, [slug])
 
@@ -33,6 +35,8 @@ const EditPost = () => {
         mutate: mutateUpdatePost,
         isLoading: isLoadingUpdatePost
     } = useMutation({
+        // will be executed when mutation is triggered
+        // calls the 'updatePost' function with the required parameters and return a promise that resolves when mutation is successful
         mutationFn: ({ updatedData, slug, token}) => {
             return updatePost({
                 updatedData,
@@ -40,20 +44,25 @@ const EditPost = () => {
                 token
             })
         },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries(["blog", slug])
+        // triggered when mutation successful
+        // invalidates query to trigger a refetch of the updated data
+        onSuccess: () => {
+            queryClient.invalidateQueries(["blog", postData.slug])
             toast.success("Post has been updated")
+            // navigate(`/blog/${postData.slug}`)
         },
+        // triggered if error occurs during mutation
         onError: (error) => {
             toast.error(error.message)
             console.log(error)
         }
     })
 
-    const updatePostHandler = (updatedData) => {
+    const updatePostHandler = (updatedData, e) => {
+        e.preventDefault ()
         mutateUpdatePost({
             updatedData, 
-            slug: data.slug, 
+            slug: postData.slug, 
             token: userState.userInfo.token
         })
     }    
@@ -64,16 +73,15 @@ const EditPost = () => {
             <section className="container mx-auto px-5 py-10">
                 <div className="w-full max-w-sm mx-auto">
                     <h1 className="font-roboto text-2xl font-bold text-center text-dark-hard mb-8">Edit Post</h1>
-                    <form onSubmit={() => updatePostHandler}>
+                    <form onSubmit={updatePostHandler}>
                         <div className="flex flex-col mb-6 w-full">
                             <label htmlFor="title" className="text-[#5a7184] font-semibold block">Title</label>
                             <input
                                 type='text'
                                 id='title'
                                 placeholder='Type title here'
-                                className=''
-                                onChange={(e) => setTitle(e.target.value)}
-                                value={title}
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col mb-6 w-full">
@@ -81,10 +89,9 @@ const EditPost = () => {
                             <input
                                 type='text'
                                 id='summary'
-                                placeholder='Type summary here'
-                                className=''
-                                value={summary}
-                                onChange={(e) => setSummary(e.target.value)}
+                                placeholder='Type Summar here'
+                                value={editedSummary}
+                                onChange={(e) => setEditedSummary(e.target.value)}
                             />
                         </div>
                         {/* <div className="flex flex-col mb-6 w-full">
@@ -98,7 +105,7 @@ const EditPost = () => {
 
                         <button
                             type='submit'
-
+                            disabled={isLoadingUpdatePost}
                         >
                             Update
                         </button>
